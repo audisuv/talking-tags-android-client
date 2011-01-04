@@ -25,7 +25,7 @@ public class Controller {
   private Store<TagCollection> collectionStore;
   private Store<Tag> tagStore;
   private ThreadQueue<Request> network;
-  
+
   public Controller(Store<TagCollection> collectionStore,
       Store<Tag> tagStore,
       ThreadQueue<Request> network) {
@@ -41,21 +41,21 @@ public class Controller {
     if (collectionStore.size() == 0) {
       adminView.showDialog(AdminView.DIALOG_INITIALISING);
       Request request = new CollectionRequest();
-      
+
       // Make network request on network queue.
       network.post(request);
     }
   }
-  
+
   /**
    * Called whenever the network thread returns.
    */
   public void onNetworkResponse(Request req) {
-    
+
     if (req.getException() != null) {
       adminView.showToast(req.getException().getMessage());
     }
-    
+
     switch (req.type) {
     case Request.TYPE_REQUEST_COLLECTIONS:
       handleCollections((CollectionRequest) req);
@@ -67,7 +67,7 @@ public class Controller {
       throw new IllegalStateException("Unrecognized request type: " + req.type);
     }
   }
-  
+
   /**
    * A bunch of tags have been returned by the server.
    *  - Update the local store.
@@ -78,12 +78,12 @@ public class Controller {
   private void handleTags(TagRequest req) {
     adminView.dismissDialog(AdminView.DIALOG_LOADING);
     List<Tag> tags = req.getTags();
-    
+
     // Write all the tags and associate with the given collection Id.
     for (Tag tag : tags) {
       tagStore.write(tag.tagId, tag, req.getCollectionId());
     }
-    
+
     // Update the state of the tag collection.
     TagCollection item = collectionStore.read(req.getCollectionId());
     if (item != null) {
@@ -101,7 +101,7 @@ public class Controller {
     for (TagCollection col : req.getCollections()) {
       collectionStore.write(col.name, col);
     }
-    
+
     adminView.onDataUpdated();
   }
 
