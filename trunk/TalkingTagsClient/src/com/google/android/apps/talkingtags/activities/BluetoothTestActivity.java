@@ -23,6 +23,11 @@ import java.util.UUID;
  * @author adamconnors
  */
 public class BluetoothTestActivity extends Activity {
+
+  // This is the standard UUID used by serial boards.
+  private static final UUID STANDARD_SERIAL_UUID
+      = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -52,7 +57,7 @@ public class BluetoothTestActivity extends Activity {
 
     BluetoothSocket socket = null;
     try {
-      socket = rfidReader.createRfcommSocketToServiceRecord(UUID.randomUUID());
+      socket = rfidReader.createRfcommSocketToServiceRecord(STANDARD_SERIAL_UUID);
       log("Got socket to reader, connecting...");
       socket.connect();
       log("Connected! Making request...");
@@ -76,6 +81,7 @@ public class BluetoothTestActivity extends Activity {
     byte[] requestFirmwareVersion = { 0x0A, (byte) 0xFF, 0x02, 0x22, (byte) 0xD3 };
     log("Writing request firmware...");
     out.write(requestFirmwareVersion);
+    out.flush();
     byte[] response = new byte[7];
     log("Reading response...");
     in.read(response);
