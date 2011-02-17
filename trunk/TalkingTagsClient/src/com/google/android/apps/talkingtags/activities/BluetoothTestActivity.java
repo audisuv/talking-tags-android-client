@@ -62,6 +62,7 @@ public class BluetoothTestActivity extends Activity {
       socket.connect();
       log("Connected! Making request...");
       String response = makeRequest(socket);
+      log("Got version response: " + response);
     } catch (IOException e) {
       log("IO Exception: " + e.getMessage());
     } finally {
@@ -85,7 +86,16 @@ public class BluetoothTestActivity extends Activity {
     byte[] response = new byte[7];
     log("Reading response...");
     in.read(response);
-    return Arrays.toString(response);
+    in.close();
+    return toHexString(response);
+  }
+
+  private String toHexString(byte[] response) {
+    StringBuilder rtn = new StringBuilder();
+    for (byte b : response) {
+      rtn.append("0x").append(Integer.toHexString(b)).append(" ");
+    }
+    return rtn.toString();
   }
 
   private void log(String s) {
