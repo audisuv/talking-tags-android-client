@@ -3,7 +3,6 @@
  */
 package com.google.android.apps.talkingtags;
 
-import org.easymock.EasyMock;
 
 import com.google.android.apps.talkingtags.activities.AdminView;
 import com.google.android.apps.talkingtags.datasources.TextDataSource;

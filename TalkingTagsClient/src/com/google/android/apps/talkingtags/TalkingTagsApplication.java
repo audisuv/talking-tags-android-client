@@ -55,7 +55,10 @@ public class TalkingTagsApplication extends Application {
     ThreadQueue<Request> network = new SimpleThreadQueue<Request>("tt-network", fetcher);
     network.start();
     
-    ctrl = new Controller(collectionStore, tagStore, network);
+    // Create Platform Services.
+    PlatformServices platformServices = new AndroidPlatformServices(this);
+    
+    ctrl = new Controller(collectionStore, tagStore, network, platformServices);
   }
 
   /**
