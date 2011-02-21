@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.google.android.apps.talkingtags;
 
@@ -21,25 +21,25 @@ import com.google.android.apps.talkingtags.threading.ThreadEndpoint;
 import com.google.android.apps.talkingtags.threading.ThreadQueue;
 
 /**
- * Core Android Application class instantiated by the system 
+ * Core Android Application class instantiated by the system
  * when any activity or service is started up.
- * 
+ *
  * Chain of instantiation runs like this:
  *   - System calls onCreate() for TalkingTagsApplication
  *   - This class instantiates and sets up Store / Fetcher threads etc.
  *   - Activity onCreate() is called which retrieves core classes from this app.
- * 
+ *
  * @author adamconnors
  */
 public class TalkingTagsApplication extends Application {
-  
+
   private Controller ctrl;
   private Handler uiThreadHandler = new Handler();
-  
+
   @Override
   public void onCreate() {
     super.onCreate();
-    
+
     // Create datastores for tags and collections.
     // TODO(adamconnors): Replace InMemoryStore with something persistent.
     Store<Tag> tagStore = new TagStore(new InMemoryStore());
@@ -50,14 +50,14 @@ public class TalkingTagsApplication extends Application {
     // elaborate fetcher.
     TextDataSource urlDataSource = new UrlTextDataSource();
     NetworkFetcher fetcher = new NetworkFetcher(urlDataSource, networkResponseEndpoint);
-    
+
     // Create network thread.
     ThreadQueue<Request> network = new SimpleThreadQueue<Request>("tt-network", fetcher);
     network.start();
-    
+
     // Create Platform Services.
     PlatformServices platformServices = new AndroidPlatformServices(this);
-    
+
     ctrl = new Controller(collectionStore, tagStore, network, platformServices);
   }
 
@@ -67,7 +67,14 @@ public class TalkingTagsApplication extends Application {
   public Controller getController() {
     return ctrl;
   }
-  
+
+  /**
+   * Will execute the given task on the UI thread.
+   */
+  public void postToUi(Runnable task) {
+    uiThreadHandler.post(task);
+  }
+
   // Receives messages back from the network thread and puts them back on the ui thread.
   private ThreadEndpoint<Request> networkResponseEndpoint = new ThreadEndpoint<Request>() {
     @Override

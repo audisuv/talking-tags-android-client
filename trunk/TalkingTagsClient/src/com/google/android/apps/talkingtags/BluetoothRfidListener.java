@@ -57,14 +57,19 @@ public class BluetoothRfidListener {
     }
 
     if (rfidReader == null) {
+      Config.log("No bluetooth devices found.");
       state = BluetoothState.NO_DEVICE_FOUND;
       return state;
     }
 
     try {
+      Config.log("Getting socket...");
       socket = rfidReader.createRfcommSocketToServiceRecord(STANDARD_SERIAL_UUID);
+      Config.log("Connecting...");
       socket.connect();
+      Config.log("Connected...");
     } catch (IOException e) {
+      Config.log("Couldn't connect to bluetooth: " + e.getMessage());
       state = BluetoothState.EXCEPTION;
       return state;
     }
