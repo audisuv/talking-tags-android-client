@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.google.android.apps.talkingtags.activities;
 
@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Toast;
 
 import com.google.android.apps.talkingtags.Controller;
 import com.google.android.apps.talkingtags.R;
@@ -21,11 +22,11 @@ import com.google.android.apps.talkingtags.TalkingTagsApplication;
 /**
  * Entry point activity for controlling the RFID service and browsing
  * the tag collections.
- * 
+ *
  * @author adamconnors
  */
 public class ControlActivity extends Activity implements ControlView {
-  
+
   private ListView list;
   private String options_off[]= { "Browse Tags", "Start Listening" };
   private String options_on[]= { "Browse Tags", "Stop Listening" };
@@ -36,17 +37,17 @@ public class ControlActivity extends Activity implements ControlView {
    */
   private static final int BROWSE = 0;
   private static final int TOGGLE_SERVICE = 1;
-  
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    
+
     ctrl = ((TalkingTagsApplication) getApplication()).getController();
     ctrl.setControlView(this);
 
     setContentView(R.layout.controlview);
     list = (ListView) findViewById(R.id.list);
-    
+
     list.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> adapter, View view, int pos, long id) {
@@ -57,7 +58,7 @@ public class ControlActivity extends Activity implements ControlView {
           startActivity(admin);
           return;
         case TOGGLE_SERVICE:
-          ctrl.setRfidServiceState(!ctrl.isRfidServiceRunning());
+          ctrl.updateRfidServiceState(!ctrl.isRfidServiceRunning());
           return;
         }
       }
@@ -73,21 +74,31 @@ public class ControlActivity extends Activity implements ControlView {
   @Override
   protected Dialog onCreateDialog(int id) {
     switch (id) {
-      case ControlView.DIALOG_LOADING:
-        return ProgressDialog.show(this, "", getString(R.string.loading), true);
+      case ControlView.DIALOG_CONNECTING:
+        return ProgressDialog.show(this, "", getString(R.string.connecting), true);
       default:
         return null;
     }
   }
 
-  
+
   @Override
   public void onDataUpdated() {
-    list.setAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1 , 
+    list.setAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1 ,
         getOptions()));
   }
 
   private String[] getOptions() {
     return (ctrl.isRfidServiceRunning()) ? options_on : options_off;
+  }
+
+  @Override
+  public void showToast(String msg) {
+    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+  }
+
+  @Override
+  public void showToast(int id) {
+    showToast(getString(id));
   }
 }

@@ -11,6 +11,7 @@
         
     <string name="initialising">Initialising...</string>
     <string name="loading">Loading...</string>
+    <string name="connecting">Connecting...</string>
 
     <string name="copt_title_available">Collection available</string>
     <string name="copt_title_unavailable">Collection unavailable</string>
@@ -19,4 +20,7 @@
     <string name="copt_show">Show</string>
     
     <string name="tagcollection_synchronized">Tag collection synchronized.</string>
+    
+    <string name="bt_nodevice">No RFID device found, are you sure it\'s on and paired.</string>
+    <string name="bt_exception">RFID connection failed.</string>
 </resources>

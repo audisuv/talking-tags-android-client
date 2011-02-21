@@ -23,7 +23,7 @@ import com.google.android.apps.talkingtags.threading.ThreadQueue;
  * @author adamconnors@google.com (Adam Connors)
  */
 public class Controller {
-  
+
   /**
    * Each view has a corresponding activity that implements it.
    */
@@ -34,15 +34,15 @@ public class Controller {
   private Store<Tag> tagStore;
   private ThreadQueue<Request> network;
   private PlatformServices platformServices;
-  
+
   /**
    * Flag indicating whether or not the Rfid service is active.
    */
   private boolean isRfidServiceRunning;
-  
+
   public Controller(Store<TagCollection> collectionStore,
       Store<Tag> tagStore,
-      ThreadQueue<Request> network, 
+      ThreadQueue<Request> network,
       PlatformServices platformServices) {
     this.collectionStore = collectionStore;
     this.tagStore = tagStore;
@@ -168,8 +168,7 @@ public class Controller {
   }
 
   /**
-   * Returns the state of the RFID listener service.
-   * @return
+   * @return true if the rfid listener service is running.
    */
   public boolean isRfidServiceRunning() {
     return isRfidServiceRunning;
@@ -179,20 +178,35 @@ public class Controller {
    * Sets the state of the RFID listener service.
    * Called from the ControlActivity action.
    */
-  public void setRfidServiceState(boolean state) {
+  public void updateRfidServiceState(boolean state) {
     if (state) {
-      // Start the listening service. When start-up is complete it will call-back to the 
+      // Start the listening service. When start-up is complete it will call-back to the
       // controller and the controller will dismiss this dialog.
-      controlView.showDialog(ControlView.DIALOG_LOADING);
+      controlView.showDialog(ControlView.DIALOG_CONNECTING);
       platformServices.startRfidListeningService();
     } else {
+      controlView.showDialog(ControlView.DIALOG_CONNECTING);
       platformServices.stopRfidListeningService();
-      controlView.onDataUpdated();
     }
   }
 
-  public void onRfidFailed(BluetoothState state) {
-    // The RFID failed for some reason, notify user.
+  public void onRfidStateChange(BluetoothState state) {
+    controlView.dismissDialog(ControlView.DIALOG_CONNECTING);
+    switch (state) {
+      case NO_DEVICE_FOUND:
+        controlView.showToast(R.string.bt_nodevice);
+        break;
+      case EXCEPTION:
+        controlView.showToast(R.string.bt_exception);
+        break;
+      case CONNECTED:
+        isRfidServiceRunning = true;
+        controlView.onDataUpdated();
+        break;
+      case READY:
+        isRfidServiceRunning = false;
+        controlView.onDataUpdated();
+    }
   }
 
   public void onRfidGotTags(List<String> tags) {
