@@ -12,11 +12,11 @@ import android.content.Context;
 
 /**
  * Handles all the communications with the Bluetooth Rfid listener.
- * 
+ *
  * @author adamconnors
  */
 public class BluetoothRfidListener {
-  
+
   public enum BluetoothState {
     READY, // Nothing is connected, nothing has happened.
     CONNECTING, // We are starting to connect.
@@ -24,28 +24,30 @@ public class BluetoothRfidListener {
     CONNECTED, // We successfully connected and have a socket.
     EXCEPTION // There was an exception talking to the device.
   }
-  
+
   private Context ctx;
   private BluetoothState state = BluetoothState.READY;
   private BluetoothSocket socket;
-  
+
   public BluetoothState getState() {
     return state;
   }
-  
+
   // This is the standard UUID used by serial boards.
   private static final UUID STANDARD_SERIAL_UUID
       = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-  
+  private BluetoothAdapter bluetoothAdapter;
+
   public BluetoothRfidListener(Context ctx) {
     this.ctx = ctx;
+    bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
   }
 
   /**
    * Connects to the bluetooth listener and sends a test message.
    */
   public BluetoothState connect() {
-    Set<BluetoothDevice> bondedDevices = BluetoothAdapter.getDefaultAdapter().getBondedDevices();
+    Set<BluetoothDevice> bondedDevices = bluetoothAdapter.getBondedDevices();
     BluetoothDevice rfidReader = null;
     for (BluetoothDevice d : bondedDevices) {
       if (d.getName().startsWith("RN")) {
@@ -66,7 +68,7 @@ public class BluetoothRfidListener {
       state = BluetoothState.EXCEPTION;
       return state;
     }
-    
+
     state = BluetoothState.CONNECTED;
     return state;
   }
