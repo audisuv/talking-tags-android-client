@@ -4,7 +4,9 @@ package com.google.android.apps.talkingtags;
 
 import java.util.List;
 
+import com.google.android.apps.talkingtags.BluetoothRfidListener.BluetoothState;
 import com.google.android.apps.talkingtags.activities.AdminView;
+import com.google.android.apps.talkingtags.activities.ControlView;
 import com.google.android.apps.talkingtags.model.Tag;
 import com.google.android.apps.talkingtags.model.TagCollection;
 import com.google.android.apps.talkingtags.network.CollectionRequest;
@@ -21,17 +23,31 @@ import com.google.android.apps.talkingtags.threading.ThreadQueue;
  * @author adamconnors@google.com (Adam Connors)
  */
 public class Controller {
+  
+  /**
+   * Each view has a corresponding activity that implements it.
+   */
   private AdminView adminView;
+  private ControlView controlView;
+
   private Store<TagCollection> collectionStore;
   private Store<Tag> tagStore;
   private ThreadQueue<Request> network;
-
+  private PlatformServices platformServices;
+  
+  /**
+   * Flag indicating whether or not the Rfid service is active.
+   */
+  private boolean isRfidServiceRunning;
+  
   public Controller(Store<TagCollection> collectionStore,
       Store<Tag> tagStore,
-      ThreadQueue<Request> network) {
+      ThreadQueue<Request> network, 
+      PlatformServices platformServices) {
     this.collectionStore = collectionStore;
     this.tagStore = tagStore;
     this.network = network;
+    this.platformServices = platformServices;
   }
 
   /**
@@ -113,6 +129,14 @@ public class Controller {
     this.adminView = adminView;
   }
 
+  /**
+   * Called by the ControlActivity when it is created.
+   * @param controlView
+   */
+  public void setControlView(ControlView controlView) {
+    this.controlView = controlView;
+  }
+
   public Store<TagCollection> getTagCollectionStore() {
     return collectionStore;
   }
@@ -141,5 +165,37 @@ public class Controller {
   public void synchronize(TagCollection col) {
     adminView.showDialog(AdminView.DIALOG_LOADING);
     network.post(new TagRequest(col.resource, col.name));
+  }
+
+  /**
+   * Returns the state of the RFID listener service.
+   * @return
+   */
+  public boolean isRfidServiceRunning() {
+    return isRfidServiceRunning;
+  }
+
+  /**
+   * Sets the state of the RFID listener service.
+   * Called from the ControlActivity action.
+   */
+  public void setRfidServiceState(boolean state) {
+    if (state) {
+      // Start the listening service. When start-up is complete it will call-back to the 
+      // controller and the controller will dismiss this dialog.
+      controlView.showDialog(ControlView.DIALOG_LOADING);
+      platformServices.startRfidListeningService();
+    } else {
+      platformServices.stopRfidListeningService();
+      controlView.onDataUpdated();
+    }
+  }
+
+  public void onRfidFailed(BluetoothState state) {
+    // The RFID failed for some reason, notify user.
+  }
+
+  public void onRfidGotTags(List<String> tags) {
+    // The RFID returned new tags.
   }
 }

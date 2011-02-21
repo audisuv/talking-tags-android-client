@@ -26,7 +26,8 @@ import com.google.android.apps.talkingtags.model.Tag;
 import com.google.android.apps.talkingtags.model.TagCollection;
 
 /**
- * Entry-point activity. Checks to see if tag-data is available.
+ * Activity for displaying available tag collections, synchronizing tag-data
+ * and browing available tags.
  * 
  * @author adamconnors
  */

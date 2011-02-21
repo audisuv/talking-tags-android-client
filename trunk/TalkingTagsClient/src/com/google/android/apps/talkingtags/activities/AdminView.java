@@ -2,12 +2,9 @@
 
 package com.google.android.apps.talkingtags.activities;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.android.apps.talkingtags.model.Tag;
-
-
 
 /**
  * Interface for view actions associated with the {@link AdminActivity}.

@@ -19,7 +19,7 @@ public class Config {
       android.util.Log.d("tt", msg);
     }
   }
-
+  
   public static void setTest(boolean b) {
     isTest = b;
   }

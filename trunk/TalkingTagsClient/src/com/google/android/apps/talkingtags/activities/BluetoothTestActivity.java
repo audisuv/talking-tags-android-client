@@ -1,6 +1,10 @@
 package com.google.android.apps.talkingtags.activities;
 
-import com.google.android.apps.talkingtags.R;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Set;
+import java.util.UUID;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -11,12 +15,7 @@ import android.util.TypedValue;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.UUID;
+import com.google.android.apps.talkingtags.R;
 
 /**
  * Simple bluetooth diagnostic activity.
