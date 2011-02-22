@@ -15,21 +15,16 @@ import android.content.Context;
  *
  * @author adamconnors
  */
-public class BluetoothRfidListener {
-
-  public enum BluetoothState {
-    READY, // Nothing is connected, nothing has happened.
-    CONNECTING, // We are starting to connect.
-    NO_DEVICE_FOUND, // No devices matching the expected SID was found.
-    CONNECTED, // We successfully connected and have a socket.
-    EXCEPTION // There was an exception talking to the device.
-  }
+public class BluetoothRfidListener implements RfidListener {
 
   private Context ctx;
-  private BluetoothState state = BluetoothState.READY;
+  private State state = State.READY;
   private BluetoothSocket socket;
 
-  public BluetoothState getState() {
+  /* (non-Javadoc)
+   * @see com.google.android.apps.talkingtags.RfidListener#getState()
+   */
+  public State getState() {
     return state;
   }
 
@@ -43,10 +38,10 @@ public class BluetoothRfidListener {
     bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
   }
 
-  /**
-   * Connects to the bluetooth listener and sends a test message.
+  /* (non-Javadoc)
+   * @see com.google.android.apps.talkingtags.RfidListener#connect()
    */
-  public BluetoothState connect() {
+  public State connect() {
     Set<BluetoothDevice> bondedDevices = bluetoothAdapter.getBondedDevices();
     BluetoothDevice rfidReader = null;
     for (BluetoothDevice d : bondedDevices) {
@@ -58,7 +53,7 @@ public class BluetoothRfidListener {
 
     if (rfidReader == null) {
       Config.log("No bluetooth devices found.");
-      state = BluetoothState.NO_DEVICE_FOUND;
+      state = State.NO_DEVICE_FOUND;
       return state;
     }
 
@@ -68,24 +63,22 @@ public class BluetoothRfidListener {
       Config.log("Connecting...");
       socket.connect();
       Config.log("Connected...");
+      startPolling();
     } catch (IOException e) {
       Config.log("Couldn't connect to bluetooth: " + e.getMessage());
-      state = BluetoothState.EXCEPTION;
+      state = State.EXCEPTION;
       return state;
     }
 
-    state = BluetoothState.CONNECTED;
+    state = State.CONNECTED;
     return state;
   }
 
-  /**
-   * Request from the listener service to tidy up so we can try again later.
-   * Clear up any instance resources, etc.
-   */
   public void reset() {
     Config.log("Bluetooth: Resetting bluetooth connection.");
     if (socket != null) {
       try {
+        stopPolling();
         socket.close();
       } catch (IOException e) {
         // Ignore, we're just shutting down.
@@ -93,14 +86,22 @@ public class BluetoothRfidListener {
         socket = null;
       }
     }
-    state = BluetoothState.READY;
+    state = State.READY;
   }
 
-  /**
-   * Pings the RFID device to see what tags are visible.
-   * @return a list of tagIds that are currently visible.
-   */
   public List<String> ping() {
     return null;
+  }
+  
+  // Sends the start polling message to the device.
+  private void startPolling() {
+  }
+  
+  // Sends the stop polling message to the device.
+  private void stopPolling() {
+  }
+
+  // Asksthe device for its visible tags.
+  private void getTags() {
   }
 }

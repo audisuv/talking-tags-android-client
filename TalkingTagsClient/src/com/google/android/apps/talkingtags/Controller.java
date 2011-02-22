@@ -4,7 +4,6 @@ package com.google.android.apps.talkingtags;
 
 import java.util.List;
 
-import com.google.android.apps.talkingtags.BluetoothRfidListener.BluetoothState;
 import com.google.android.apps.talkingtags.activities.AdminView;
 import com.google.android.apps.talkingtags.activities.ControlView;
 import com.google.android.apps.talkingtags.model.Tag;
@@ -190,7 +189,7 @@ public class Controller {
     }
   }
 
-  public void onRfidStateChange(BluetoothState state) {
+  public void onRfidStateChange(RfidListener.State state) {
     controlView.dismissDialog(ControlView.DIALOG_CONNECTING);
     switch (state) {
       case NO_DEVICE_FOUND:
@@ -210,6 +209,18 @@ public class Controller {
   }
 
   public void onRfidGotTags(List<String> tags) {
-    // The RFID returned new tags.
+    controlView.setNearbyTags(tags);
+  }
+
+  /**
+   * Launches the tag reading activity either from a click in the ConrolView or
+   * based on a new tag coming into range.
+   */
+  public void onShowTag(String nearbyTagData) {
+    platformServices.readTag(nearbyTagData);
+  }
+
+  public void invalidTag() {
+    controlView.showToast("Invalid tag");
   }
 }

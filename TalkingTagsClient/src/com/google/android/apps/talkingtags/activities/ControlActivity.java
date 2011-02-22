@@ -3,15 +3,19 @@
  */
 package com.google.android.apps.talkingtags.activities;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Toast;
 
@@ -28,9 +32,12 @@ import com.google.android.apps.talkingtags.TalkingTagsApplication;
 public class ControlActivity extends Activity implements ControlView {
 
   private ListView list;
+  private TextView nearbyTag;
+  
   private String options_off[]= { "Browse Tags", "Start Listening" };
   private String options_on[]= { "Browse Tags", "Stop Listening" };
   private Controller ctrl;
+  private String nearbyTagData;
 
   /**
    * Ordinal positions of options in the options arrays.
@@ -47,7 +54,8 @@ public class ControlActivity extends Activity implements ControlView {
 
     setContentView(R.layout.controlview);
     list = (ListView) findViewById(R.id.list);
-
+    nearbyTag = (TextView) findViewById(R.id.nearbyTag);
+    
     list.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> adapter, View view, int pos, long id) {
@@ -61,6 +69,13 @@ public class ControlActivity extends Activity implements ControlView {
           ctrl.updateRfidServiceState(!ctrl.isRfidServiceRunning());
           return;
         }
+      }
+    });
+    
+    nearbyTag.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        ctrl.onShowTag(nearbyTagData);
       }
     });
   }
@@ -100,5 +115,16 @@ public class ControlActivity extends Activity implements ControlView {
   @Override
   public void showToast(int id) {
     showToast(getString(id));
+  }
+
+  @Override
+  public void setNearbyTags(List<String> tags) {
+    // TODO: Show the full list instead of just the first.
+    if (tags == null || tags.size() == 0) {
+      nearbyTag.setText(R.string.no_tags);
+    } else {
+      nearbyTagData = tags.get(0);
+      nearbyTag.setText(nearbyTagData);
+    }
   }
 }

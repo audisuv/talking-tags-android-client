@@ -1,5 +1,7 @@
 package com.google.android.apps.talkingtags;
 
+import com.google.android.apps.talkingtags.activities.TagActivity;
+
 import android.content.Context;
 import android.content.Intent;
 
@@ -29,5 +31,13 @@ public class AndroidPlatformServices implements PlatformServices {
     Intent start = new Intent(ctx, RfidListeningService.class);
     start.setAction(RfidListeningService.ACTION_STOP);
     ctx.startService(start);
+  }
+
+  @Override
+  public void readTag(String nearbyTagData) {
+    Intent read = new Intent(ctx, TagActivity.class);
+    read.putExtra(TagActivity.EXTRA_ID, nearbyTagData);
+    read.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    ctx.startActivity(read);
   }
 }

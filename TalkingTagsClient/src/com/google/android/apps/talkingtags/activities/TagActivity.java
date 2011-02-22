@@ -59,13 +59,18 @@ public class TagActivity extends Activity implements OnInitListener {
 
       if (id != null) {
         Tag tag = ctrl.getTagStore().read(id);
-        Config.log("Got id: " + id + " and found tag: " + tag.title);
         if (tag != null) {
           title = tag.title;
           body = tag.body;
+        } else {
+          ctrl.invalidTag();
+          finish();
+          return;
         }
       }
-      
+
+      Config.log("Got id: " + id + " and found tag: " + title);
+
       // Fill in some test information.
       // TODO(adamconnors): Kick off a server request to fetch this tag.
       if (title == null) {
