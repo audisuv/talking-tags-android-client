@@ -21,6 +21,9 @@
     
     <string name="tagcollection_synchronized">Tag collection synchronized.</string>
     
+    <string name="nearby_tags">Nearby Tags</string>
+    <string name="no_tags">No nearby tags</string>
+    
     <string name="bt_nodevice">No RFID device found, are you sure it\'s on and paired.</string>
     <string name="bt_exception">RFID connection failed.</string>
 </resources>

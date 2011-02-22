@@ -12,4 +12,5 @@ package com.google.android.apps.talkingtags;
 public interface PlatformServices {
   void startRfidListeningService();
   void stopRfidListeningService();
+  void readTag(String nearbyTagData);
 }

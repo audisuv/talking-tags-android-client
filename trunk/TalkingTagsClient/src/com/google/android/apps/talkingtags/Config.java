@@ -10,6 +10,8 @@ public class Config {
   public static final String COLLECTIONS_RESOURCE = "available-collections.txt";
   public static final String SERVER_SUFFIX = "?attredirects=0&d=1";
   
+  private static final boolean IS_DEMO_MODE = true;
+  
   private static boolean isTest = false;
   
   public static void log(String msg) {
@@ -22,5 +24,9 @@ public class Config {
   
   public static void setTest(boolean b) {
     isTest = b;
+  }
+
+  public static boolean isDemoMode() {
+    return IS_DEMO_MODE;
   }
 }

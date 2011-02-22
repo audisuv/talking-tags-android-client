@@ -2,12 +2,11 @@ package com.google.android.apps.talkingtags;
 
 import java.util.List;
 
-import com.google.android.apps.talkingtags.BluetoothRfidListener.BluetoothState;
-
 import android.app.Service;
 import android.content.Intent;
-import android.os.Handler;
 import android.os.IBinder;
+
+import com.google.android.apps.talkingtags.RfidListener.State;
 
 /**
  * Service that connects to the RFID bluetooth connection and listens for nearby tags.
@@ -35,14 +34,14 @@ public class RfidListeningService extends Service implements Runnable {
 
   private Thread listenThread;
 
-  private BluetoothRfidListener rfid;
+  private RfidListener rfid;
   private Controller ctrl;
   private TalkingTagsApplication app;
 
   @Override
   public void onCreate() {
     super.onCreate();
-    rfid = new BluetoothRfidListener(this);
+    rfid = (Config.isDemoMode()) ? new FakeRfidListener() : new BluetoothRfidListener(this);
     app = ((TalkingTagsApplication) getApplication());
     ctrl = app.getController();
   }
@@ -85,12 +84,12 @@ public class RfidListeningService extends Service implements Runnable {
 
   @Override
   public void run() {
-    assert rfid.getState() == BluetoothState.READY;
+    assert rfid.getState() == State.READY;
     Config.log("Connecting to bluetooth...");
-    BluetoothState state = rfid.connect();
+    State state = rfid.connect();
     notifyControllerRfidStateChange(state);
 
-    if (state != BluetoothState.CONNECTED) {
+    if (state != State.CONNECTED) {
       Config.log("Couldn't connect, dropping out of ping thread.");
       rfid.reset();
       return;
@@ -106,7 +105,6 @@ public class RfidListeningService extends Service implements Runnable {
       List<String> tags = rfid.ping();
       notifyControllerGotTags(tags);
 
-      Config.log("ListenerService: Sleeping for " + PING_INTERVAL + "ms before next RFID ping.");
       try {
         Thread.sleep(PING_INTERVAL);
       } catch (InterruptedException e) {
@@ -128,7 +126,7 @@ public class RfidListeningService extends Service implements Runnable {
     });
   }
 
-  private void notifyControllerRfidStateChange(final BluetoothState state) {
+  private void notifyControllerRfidStateChange(final State state) {
     app.postToUi(new Runnable() {
       @Override
       public void run() {
