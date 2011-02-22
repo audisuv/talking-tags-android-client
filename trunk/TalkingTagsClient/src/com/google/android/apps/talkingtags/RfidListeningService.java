@@ -41,7 +41,7 @@ public class RfidListeningService extends Service implements Runnable {
   @Override
   public void onCreate() {
     super.onCreate();
-    rfid = (Config.isDemoMode()) ? new FakeRfidListener() : new BluetoothRfidListener(this);
+    rfid = (Config.isDemoMode()) ? new FakeRfidListener() : new BluetoothRfidListener();
     app = ((TalkingTagsApplication) getApplication());
     ctrl = app.getController();
   }

@@ -15,6 +15,7 @@ import android.util.TypedValue;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.apps.talkingtags.BluetoothRfidListener;
 import com.google.android.apps.talkingtags.R;
 
 /**
@@ -36,65 +37,10 @@ public class BluetoothTestActivity extends Activity {
   @Override
   protected void onResume() {
     super.onResume();
-    log("Bonded devices...");
-    Set<BluetoothDevice> bondedDevices = BluetoothAdapter.getDefaultAdapter().getBondedDevices();
-    BluetoothDevice rfidReader = null;
-    for (BluetoothDevice d : bondedDevices) {
-      log("Found paired device: " + d.getName());
-      if (d.getName().startsWith("RN")) {
-        rfidReader = d;
-        break;
-      }
-    }
-
-    if (rfidReader != null) {
-      log("Found a paired device with name RN***. Connecting to reader...");
-    } else {
-      log("No paired device with name RN*** found. Is your reader paired?");
-      return;
-    }
-
-    BluetoothSocket socket = null;
-    try {
-      socket = rfidReader.createRfcommSocketToServiceRecord(STANDARD_SERIAL_UUID);
-      log("Got socket to reader, connecting...");
-      socket.connect();
-      log("Connected! Making request...");
-      String response = makeRequest(socket);
-      log("Got version response: " + response);
-    } catch (IOException e) {
-      log("IO Exception: " + e.getMessage());
-    } finally {
-      if (socket != null) {
-        try {
-          socket.close();
-        } catch (Exception e) {
-          // ignore.
-        }
-      }
-    }
-  }
-
-  private String makeRequest(BluetoothSocket socket) throws IOException {
-    InputStream in = socket.getInputStream();
-    OutputStream out = socket.getOutputStream();
-    byte[] requestFirmwareVersion = { 0x0A, (byte) 0xFF, 0x02, 0x22, (byte) 0xD3 };
-    log("Writing request firmware...");
-    out.write(requestFirmwareVersion);
-    out.flush();
-    byte[] response = new byte[7];
-    log("Reading response...");
-    in.read(response);
-    in.close();
-    return toHexString(response);
-  }
-
-  private String toHexString(byte[] response) {
-    StringBuilder rtn = new StringBuilder();
-    for (byte b : response) {
-      rtn.append("0x").append(Integer.toHexString(b)).append(" ");
-    }
-    return rtn.toString();
+    BluetoothRfidListener rfid = new BluetoothRfidListener();
+    log("connecting...");
+    rfid.connect();
+    log("connected");
   }
 
   private void log(String s) {

@@ -18,7 +18,7 @@ public class TagActivity extends Activity implements OnInitListener {
     public static final String EXTRA_TITLE = "com.google.apps.android.talkingtags.TITLE";
     public static final String EXTRA_BODY = "com.google.apps.android.talkingtags.BODY";
     public static final String EXTRA_ID = "com.google.apps.android.talkingtags.ID";
-    
+
     private static final int CHECK_CODE = 0;
 
     private TextToSpeech tts;
@@ -78,15 +78,21 @@ public class TagActivity extends Activity implements OnInitListener {
       }
 
       titleText.setText(title);
-      
+
       if (body != null) {
-        bodyText.setText(body);
+        bodyText.setText(body.trim());
       }
 
       Config.log("onResume, starting utterances: " + tts);
       if (tts != null) {
         startUtterances();
       }
+    }
+
+    @Override
+    protected void onPause() {
+      super.onPause();
+      stopUtterances();
     }
 
     @Override
@@ -103,9 +109,18 @@ public class TagActivity extends Activity implements OnInitListener {
      */
     private void startUtterances() {
       tts.speak(title, TextToSpeech.QUEUE_FLUSH, null);
-      
+
       if (body != null) {
         tts.speak(body, TextToSpeech.QUEUE_ADD, null);
+      }
+    }
+
+    /**
+     * Halt the current speech.
+     */
+    private void stopUtterances() {
+      if (tts != null) {
+        tts.stop();
       }
     }
 
