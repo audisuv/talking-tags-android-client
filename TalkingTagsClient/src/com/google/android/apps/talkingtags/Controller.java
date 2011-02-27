@@ -92,6 +92,12 @@ public class Controller {
    */
   private void handleTags(TagRequest req) {
     adminView.dismissDialog(AdminView.DIALOG_LOADING);
+
+    if (req == null || req.getTags() == null) {
+      adminView.showDialog(AdminView.DIALOG_NETWORK_ERROR);
+      return;
+    }
+    
     List<Tag> tags = req.getTags();
 
     // Write all the tags and associate with the given collection Id.
@@ -113,6 +119,12 @@ public class Controller {
 
   private void handleCollections(CollectionRequest req) {
     adminView.dismissDialog(AdminView.DIALOG_INITIALISING);
+    
+    if (req == null || req.getCollections() == null) {
+      adminView.showDialog(AdminView.DIALOG_NETWORK_ERROR);
+      return;
+    }
+    
     for (TagCollection col : req.getCollections()) {
       collectionStore.write(col.name, col);
     }
