@@ -1,0 +1,1 @@
+Using RFID tags to trigger snippets of accessible content.
